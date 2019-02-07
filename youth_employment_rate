@@ -1,0 +1,93 @@
+
+## this file graphs the youth employment rate of 16 to 24 year olds in the UK
+## 1993 to 2018
+## the data are originally from ONS Labour Market Statistics
+## https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/labourmarketstatistics
+
+## the 2018 figure is added from the first three quarters of the 2018 LFS which is the most recent data available
+
+## Kevin Ralston 2019 k.ralston@yorksj.ac.uk
+## 04/02/2019
+
+##  The data are available here:
+##  https://drive.google.com/open?id=15DvR8uOK4ZDfY4xc7TFx65opFHz-ZeKB
+## and on github
+
+library(gridExtra)
+library(grid)
+library(ggplot2)
+library(reshape2)
+library(tidyverse)
+library(data.table)
+
+# https://www.r-bloggers.com/getting-data-from-an-online-source/
+
+# I have these data stored locally
+# point the path at the directory with the datasets
+
+path.data <- ("E://Datasets//LMS_TS")
+
+# set this path as the working directory
+setwd(path.data)
+
+getwd()
+
+# Give a name of your data file
+dataset.one <- "Employment_rate_16to24_20190203.csv"
+
+# read in these data as the object 'dataset2.dta'
+emprate.16to24 <- read.csv("Employment_rate_16to24_20190203.csv")
+
+# have a look at the data
+attributes(emprate.16to24)$var.labels
+attributes(emprate.16to24)$label.table
+
+emprate.16to24
+
+###################
+
+###### the grammar of R doesn't work with Stata grammar
+##### in Stata I overlay variables in the graph
+
+##### in R they do not overlay they use group command
+
+#### the melt command restructures the data to include the variables two variable on one group in R
+
+# https://stackoverflow.com/questions/3427457/ggplot-and-r-two-variables-over-time
+
+dfm = melt(emprate.16to24, id.vars='date')
+
+dfm
+
+## https://www.r-statistics.com/2011/12/data-frame-objects-in-r-via-r-in-action/
+
+percent <- dfm$value
+year <- dfm$date
+sex <- dfm$variable
+
+year
+percent
+
+## http://ggplot.yhathq.com/docs/geom_line.html
+## https://plot.ly/ggplot2/geom_line/
+
+p <- ggplot(dfm, aes(x=year, y=percent, colour=sex)) + geom_line(aes(linetype=sex), size=1) + geom_point() +
+      ggtitle("UK employment rate of 16 to 24 year olds, 1993 to 2018") + 
+      theme(legend.position=c(.9,.75))
+            
+# http://www.sthda.com/english/wiki/ggplot2-axis-ticks-a-guide-to-customize-tick-marks-and-labels
+
+# p + theme(axis.text.x= element_text(colour, size))
+
+# p + scale_x_discrete(label=c ("1993", "2000", "2010", "2018"))
+
+############# 
+
+p1 <- p + labs(subtitle = "Labour Force Survey (LFS) estimates",
+               caption = "Source: Labour Market Statistics (ons.gov.uk) - Kevin Ralston 2019, k.ralston@yorksj.ac.uk")
+ggsave("plot.pdf", p1)
+
+p1
+
+## Graph here:
+## https://rpubs.com/kevralston/rate_16to24
