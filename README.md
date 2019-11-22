@@ -1,5 +1,5 @@
-# Labour_force_survey_explore
-I am exploring the LFS
+# Labour force survey explore
+
 ** Kevin Ralston 2018
 
 this file is an exploration of the LFS. I have the 75, 85 95, 05, 15 LFS. 
@@ -15,7 +15,11 @@ Occupation
 In comparison to non-migrants
 	Across regions
 	By age and sex and levels of education
-	
+
+*****************************************************************************************************
+2019
+
+** Since this exploratory work I have gone on t analyse the youth labour market comparing the period before and after the great recession of 2008
 	
 Files:<br/> 
 **Explore_20181212_KR_V1.do** - this file does some organising and exploation of the LFS<br/>
