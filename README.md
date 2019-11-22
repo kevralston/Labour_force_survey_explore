@@ -15,3 +15,8 @@ Occupation
 In comparison to non-migrants
 	Across regions
 	By age and sex and levels of education
+	
+	
+Files:  Explore_20181212_KR_V1.do 	- this file does some organising and exploation of the LFS
+
+
