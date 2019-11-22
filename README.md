@@ -19,7 +19,7 @@ In comparison to non-migrants
 *****************************************************************************************************
 2019
 
-** Since this exploratory work I have gone on t analyse the youth labour market comparing the period before and after the great recession of 2008
+** Since this exploratory work I have gone on to analyse the youth labour market comparing the period before and after the great recession of 2008
 	
 Files:<br/> 
 **Explore_20181212_KR_V1.do** - this file does some organising and exploation of the LFS<br/>
