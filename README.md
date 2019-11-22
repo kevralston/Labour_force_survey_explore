@@ -2,7 +2,7 @@
 I am exploring the LFS
 ** Kevin Ralston 2018
 
-/* this file is an exploration of the LFS. I have the 75, 85 95, 05, 15 LFS. 
+this file is an exploration of the LFS. I have the 75, 85 95, 05, 15 LFS. 
 
 I am just feeling it out for a couple of projects.
 I am intersted in intergenerational ineqiality
@@ -17,8 +17,8 @@ In comparison to non-migrants
 	By age and sex and levels of education
 	
 	
-Files:\  
-Explore_20181212_KR_V1.do 	- this file does some organising and exploation of the LFS\
-paper1				- this file undertakes analysis of LFS 05-07 & 15-17, for a paper with Adam Fromby\
-youth_employment_rate - R code to graph the youth employment rate\ 
+Files:<br/> 
+Explore_20181212_KR_V1.do - this file does some organising and exploation of the LFS<br/>
+paper1	- this file undertakes analysis of LFS 05-07 & 15-17, for a paper with Adam Fromby<br/>
+youth_employment_rate - R code to graph the youth employment rate<br/>
 Youth_employment_rate_20190205 - data for the youth employment rate graph
