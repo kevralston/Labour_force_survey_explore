@@ -1,0 +1,913 @@
+/* 
+
+This file conducts an analysis of the Labour Force Survey
+
+Data are pooled from 05-07 and 15-17 in order to compare the occupational position
+of young people 18-24 years of age before and after the Great Recession of 2008
+
+this pools the LFS quarterly datasets
+https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000026#!/access-data
+
+The file also merges CAMSIS scores, based on soc2000 4 digit level
+
+
+Kevin Ralston 22/11/2019
+
+*/ 
+
+clear
+
+************ LFS 2005
+global path3 "E:\Datasets\LFS\LFS_2005"
+************ LFS 2006
+global path3a "E:\Datasets\LFS\LFS_2006"
+************ LFS 2007
+global path3b "E:\Datasets\LFS\LFS_2007"
+************ LFS 2015
+global path2 "E:\Datasets\LFS\LFS_2015"
+************ LFS 2016
+global path2a "E:\Datasets\LFS\LFS_2016"
+************ LFS 2017
+global path2b "E:\Datasets\LFS\LFS_2017"
+
+************ Save path
+
+global path_s "E:\Datasets\LFS\LFS_2015\Save"
+
+*** CAMSIS data
+global path4 "E:\Datasets\CAMSIS"
+
+
+*********************************************************************************
+*********************************************************************************
+
+
+**** LFS Models
+
+*** I want occupation, controling; gender, age, geography, qualifications year 
+
+/* 			MIGHT BE GOOD
+
+GOVTOF - Government Office Regions - Summary
+(1) North East
+(2) North West
+(3) Merseyside
+(4) Yorkshire & Humberside
+(5) East Midlands
+(6) West Midlands
+(7) Eastern
+(8) London
+(9) South East
+(10) South West
+(11) Wales
+(12) Scotland
+(13) Northern Ireland
+
+	*/
+
+clear
+
+*** lfs 05 
+
+use $path3\lfsp_aj05.dta
+
+append using "$path3\lfsp_jm05"
+append using "$path3\lfsp_js05"
+append using "$path3\lfsp_od05"
+
+gen year=2005
+
+keep if AGE>=18 & AGE<=24 
+
+tab THISWV
+
+/* 
+
+THISWV - Wave to which data refers
+(1-5) Wave number
+FREQUENCY: Each quarter from Spring 92.
+
+*/
+
+*** SOC2KM - Occupation in main job - uses SOC2000
+
+keep year AGE SEX SOC2KM URESMC HIQUAL5D FTPT INECAC05 NSECM PWT14 CASENOP THISWV
+
+rename PWT14 pw
+
+save $path_s\b05.dta, replace
+
+*** lfs 06 
+
+clear
+
+use $path3a\lfsp_aj06.dta
+
+append using "$path3a\lfsp_jm06"
+append using "$path3a\lfsp_js06"
+append using "$path3a\lfsp_od06"
+
+gen year=2006
+
+keep if AGE>=18 & AGE<=24 
+
+keep year AGE SEX SOC2KM URESMC HIQUAL5D FTPT INECAC05 NSECM PWT14 CASENO THISWV
+
+rename PWT14 pw
+
+save $path_s\b06.dta, replace
+
+*** lfs 07 
+
+clear
+
+use $path3b\lfsp_aj07.dta
+
+append using "$path3b\lfsp_jm07"
+append using "$path3b\lfsp_js07"
+append using "$path3b\lfsp_od07"
+
+gen year=2007
+
+keep if AGE>=18 & AGE<=24 
+
+keep year AGE SEX SOC2KM URESMC HIQUAL5D FTPT INECAC05 NSECM PWT14 CASENO THISWV
+
+rename PWT14 pw
+
+save $path_s\b07.dta, replace
+
+tab year
+
+*** lfs 2015 
+
+clear
+
+use $path2\lfsp_aj15.dta
+
+append using "$path2\lfsp_jm15"
+append using "$path2\lfsp_js15"
+append using "$path2\lfsp_od15"
+
+gen year=2015
+
+keep if AGE>=18 & AGE<=24 
+
+keep year AGE SEX SC102KM URESMC FTPT HIQUL15D INECAC05 NSECM10 PWT17 CASENO THISWV
+
+rename SC102KM SOC2KM
+
+rename HIQUL15D HIQUAL5D
+
+rename NSECM10 NSECM
+
+rename PWT17 pw
+
+save $path_s\b15.dta, replace
+
+*** lfs 2016
+
+clear
+
+use $path2a\lfsp_aj16.dta
+
+append using "$path2a\lfsp_jm16"
+append using "$path2a\lfsp_js16"
+append using "$path2a\lfsp_od16"
+
+gen year=2016
+
+keep if AGE>=18 & AGE<=24 
+
+keep year AGE SEX SC102KM URESMC HIQUL15D FTPT INECAC05 NSECM10 PWT18 CASENO THISWV
+
+rename SC102KM SOC2KM
+
+rename HIQUL15D HIQUAL5D
+
+rename NSECM10 NSECM
+
+rename PWT18 pw
+
+save $path_s\b16.dta, replace
+
+*** lfs 2017
+
+clear
+
+use $path2b\lfsp_aj17.dta
+
+append using "$path2b\lfsp_jm17"
+append using "$path2b\lfsp_js17"
+append using "$path2b\lfsp_od17"
+
+gen year=2017
+
+keep if AGE>=18 & AGE<=24 
+
+keep year AGE SEX SC102KM URESMC HIQUL15D FTPT INECAC05 NSECM10 PWT18 CASENO THISWV
+
+rename SC102KM SOC2KM
+
+rename HIQUL15D HIQUAL5D
+
+rename NSECM10 NSECM
+
+rename PWT18 pw
+
+save $path_s\b17.dta, replace
+
+append using "$path_s\b07.dta"
+append using "$path_s\b06.dta"
+append using "$path_s\b05.dta"
+
+append using "$path_s\b16.dta"
+append using "$path_s\b15.dta"
+
+egen tag = tag(CASENOP)
+
+sort CASENOP year
+
+save $path_s\lfs05-07_15-17.dta, replace
+
+********************************************************************************
+
+**** 					modelling the data
+
+clear 
+
+use E:\Datasets\LFS\LFS_2015\Save\lfs05-07_15-17.dta
+
+*** need to rename age and sex
+
+numlabel _all, add
+
+rename AGE age
+
+summ age
+
+rename SEX sex
+
+*** this variable tells us which wave this is for the panel
+*** keeping only wave 1 means we drop all individuals measured
+*** more than once
+
+tab THISWV
+
+keep if THISWV==1
+
+*** generate a year varibale
+
+* gen year = 2005
+
+*** 4 digit soc main job
+
+sum SOC2KM
+
+clonevar soc2000 = SOC2KM
+recode soc2000 -9=.
+recode soc2000 -8=.
+
+sum soc2000
+
+*** region of usual residence
+
+tab URESMC, missing
+
+clonevar region = URESMC
+
+*** qualifications
+
+tab HIQUAL5D
+
+*** FTPT full time or part time worker
+
+tab FTPT
+
+*** employment status
+
+tab INECAC05, missing
+
+capture drop emp_stat		
+gen emp_stat = . 
+	replace emp_stat = 0  if INECAC05 ==2
+	replace emp_stat = 1  if INECAC05 ==1
+	replace emp_stat = 2  if INECAC05 ==11 | INECAC05 ==22 | INECAC05 ==33
+	replace emp_stat = 3  if INECAC05==3 | INECAC05==5 | (INECAC05 >=6 & INECAC05 <=11)
+	replace emp_stat = 4  if INECAC05 ==12 | INECAC05 ==23	
+	replace emp_stat = 5  if INECAC05 ==7 | INECAC05 ==8 | INECAC05 ==15 | INECAC05 ==16 | INECAC05 ==26 | INECAC05 ==27 
+	replace emp_stat = 6  if INECAC05 ==6 | INECAC05 ==13 | INECAC05 ==24
+	replace emp_stat = 7  if INECAC05 ==20 | INECAC05 ==31
+	replace emp_stat = 8  if INECAC05 ==4 | INECAC05 ==7 | INECAC05 ==14 | INECAC05 ==25
+	replace emp_stat = 9  if INECAC05 ==10 | INECAC05 ==17 | INECAC05 ==18 | INECAC05 ==19 | INECAC05 ==21 | INECAC05 ==28 |INECAC05 ==29 |INECAC05 ==30 | INECAC05 ==32
+*	replace emp_stat = 10 if INECAC05 
+	replace emp_stat = 11 if INECAC05 ==34
+	
+tab emp_stat	
+
+
+label define emp_statl 0"Self-employed" 1"Employee" 2"not-stated" 3"seeking work" 4"waiting to take up job" 5"sick" 6"student" 7"retired" 8"housewife" 9"other inactive" ///
+		10"not-known" 11"Under 16"
+		label values emp_stat emp_statl
+		label variable emp_stat "Employment status"
+
+		
+numlabel emp_statl, add		
+tab emp_stat, miss	
+
+tab INECAC05
+tab INECAC05 emp_stat 
+
+ destring NSECM,  gen(nssec)
+
+capture drop stdempst 
+gen stdempst =. 
+replace stdempst= 0 if emp_stat==2 | emp_stat==3 | emp_stat==4 | emp_stat==5 | emp_stat==6 | emp_stat==7 | emp_stat==8 | emp_stat== 9 | emp_stat==.
+replace stdempst= 2 if emp_stat== 0
+replace stdempst= 3 if nssec==9.1 | nssec==9.2
+replace stdempst= 4 if nssec== 1
+replace stdempst= 6 if emp_stat== 1
+
+tab stdempst
+
+tab NSECM,
+
+*********************************************************************************
+
+*** Merge with CAMSIS
+
+sort soc2000 stdempst
+
+merge m:m soc2000 stdempst using $path4\gb91soc2000.dta
+
+summ soc2000
+
+drop if _merge==2
+
+*********************************************************************************
+
+svyset [pweight=pw]
+
+*** looks women are doing better than guys.
+
+mean mcamsis if sex==1
+mean fcamsis if sex==2
+
+svy: mean mcamsis if sex==1
+svy: mean fcamsis if sex==2
+
+*** working full time 
+
+mean mcamsis if sex==1 & FTPT==1
+mean fcamsis if sex==2 & FTPT==1
+
+***
+
+centile mcamsis if sex==1
+centile fcamsis if sex==2
+
+*** qualifications
+
+tab HIQUAL5D
+
+mvdecode HIQUAL5D, mv(-9 -8)
+
+table HIQUAL5D if sex==1, contents(mean mcamsis)
+table HIQUAL5D if sex==2, contents(mean fcamsis)
+
+***
+
+*********************************************************************************
+
+*** region
+
+tab region 
+
+* numlabel region, remove
+
+table region if sex==1, contents(mean mcamsis)
+table region if sex==2, contents(mean fcamsis)
+
+*********************************************************************************
+
+*** great recession variable
+gen grt_rec=.
+replace grt_rec=1 if year==2005 | year==2006 | year==2007
+replace grt_rec=2 if year==2015 | year==2016 | year==2017
+
+label define grt_recl 1"2005-2007" 2"2015-2017" 
+		label values grt_rec grt_recl
+		label variable grt_rec "Before or after the recession"
+
+tab grt_rec
+
+****
+		
+reg mcamsis i.region i.age i.HIQUAL5D i.year if sex==1 & FTPT==1
+
+svy: reg mcamsis i.region i.age i.HIQUAL5D if sex==1 & FTPT==1
+
+reg fcamsis i.region i.age i.HIQUAL5D i.year if sex==2 & FTPT==1
+
+reg mcamsis i.region#i.year i.age i.HIQUAL5D if sex==1 & FTPT==1
+
+**** *** great recession variable
+
+reg mcamsis i.region i.age i.HIQUAL5D i.grt_rec if sex==1 & FTPT==1
+reg fcamsis i.region i.age i.HIQUAL5D i.grt_rec if sex==2 & FTPT==1
+
+**** *** great recession variable interaction
+
+reg mcamsis i.region#i.grt_rec i.age i.HIQUAL5D if sex==1 & FTPT==1
+reg fcamsis i.region#i.grt_rec i.age i.HIQUAL5D if sex==2 & FTPT==1
+
+*********************************************************************************
+
+reg mcamsis i.region#i.grt_rec i.age i.HIQUAL5D if sex==1 & FTPT==1
+	margins i.region#i.grt_rec
+
+		marginsplot, xlabel(, angle(55) labsize(vsmall)) ///
+			title("Occupational position of 18-24 year old men") ///
+				legend(position(7) ring(0) size(vsmall)) ///
+				xtitle("") ///
+				ytitle("") ///
+				xsize(6.5) ///
+				scheme(s1mono)
+
+reg mcamsis i.region#i.grt_rec i.age i.HIQUAL5D if sex==1 & FTPT==1
+	margins i.region#i.grt_rec, at(HIQUAL5D=4) 		
+		marginsplot, xlabel(, angle(55) labsize(vsmall)) ///
+			title("Occupational position of 18-24 year old men") ///
+				legend(position(7) ring(0) size(vsmall)) ///
+				xtitle("") ///
+				ytitle("") ///
+				xsize(6.5) ///
+				scheme(s1mono) 
+		
+******		
+		
+reg fcamsis i.region#i.grt_rec i.age i.HIQUAL5D if sex==2 & FTPT==1
+	margins i.region#i.grt_rec
+		marginsplot, xlabel(, angle(55) labsize(vsmall)) ///
+			title("Occupational position of 18-24 year old women") ///
+				legend(position(7) ring(0) size(vsmall)) ///
+				xtitle("") ///
+				ytitle("") ///
+				xsize(6.5) ///
+				scheme(s1mono)
+
+
+*********************************************************************************
+
+*** for graphing the models I will make a temporary save file
+				
+save $path_s\temp1.dta, replace
+
+********************************************************************************
+
+**** 					modelling the data
+
+clear 
+
+use E:\Datasets\LFS\LFS_2015\Save\temp1.dta
+			
+				
+tab region
+
+gen region_ord =. 
+
+*** working full time 
+
+table region if sex==1, contents(mean mcamsis)
+table region if sex==2, contents(mean fcamsis)
+
+
+/* reorganising region into CAMSIS score order for men
+
+1	19            Rest of Scotland#2005-2007  |   43.87696   .6823042    64.31   0.000     42.53949    45.21442
+2	5 			 Rest of Yorks and Humberside#2005-2007  |   44.38448   .9424007    47.10   0.000     42.53718    46.23179
+3	 20			 Northern Ireland#2005-2007  |    44.6463   .6752717    66.12   0.000     43.32262    45.96998
+4	1              Tyne and Wear#2005-2007  |   44.88331   1.057501    42.44   0.000     42.81038    46.95625
+5	3             South Yorkshire#2005-2007  |   45.03519   .9694924    46.45   0.000     43.13477     46.9356
+6	  17                     Wales#2005-2007  |   45.28926   .6898904    65.65   0.000     43.93692    46.64159
+7	15                  Merseyside#2005-2007  |   45.80654   1.003375    45.65   0.000     43.83971    47.77337
+8	13       Rest of West Midlands#2005-2007  |     45.836   .6962633    65.83   0.000     44.47117    47.20083
+9	11               South West#2005-2007  |   45.78831   .5384671    85.03   0.000      44.7328    46.84383
+10	 6              East Midlands#2005-2007  |   46.13094   .5296287    87.10   0.000     45.09275    47.16912
+11	14          Greater Manchester#2005-2007  |   46.15626   .6486577    71.16   0.000     44.88475    47.42777
+12	2     Rest of Northern Region#2005-2007  |   46.18346   .8309303    55.58   0.000     44.55465    47.81226
+13	 16         Rest of North West#2005-2007  |   46.22201   .7202246    64.18   0.000     44.81021    47.63381
+14	7                 East Anglia#2005-2007  |   46.96003   .7903289    59.42   0.000     45.41081    48.50924
+15	4              West Yorkshire#2005-2007  |   46.98026   .6963279    67.47   0.000     45.61531    48.34521
+16	 18                Strathclyde#2005-2007  |   47.24459   .8078865    58.48   0.000     45.66096    48.82823
+17	10          Rest of South East#2005-2007  |   48.21285   .3532865   136.47   0.000     47.52033    48.90537
+18	12               West Midlands#2005-2007  |   48.22671   .7669414    62.88   0.000     46.72333    49.73008
+19	9              Outer London#2015-2017  |   48.61066    .760176    63.95   0.000     47.12055    50.10077
+20	8               Inner London#2015-2017  |   50.16127   1.125386    44.57   0.000     47.95527    52.36727
+
+*/
+
+***
+
+*** ordering the regions by lowest camsis to highest, for a nice graph
+
+capture drop reg_a
+gen reg_a = . 
+replace reg_a = 1 if region==19
+replace reg_a = 2 if region==5
+replace reg_a = 3 if region==20
+replace reg_a = 4 if region==1
+replace reg_a = 5 if region==3
+replace reg_a = 6 if region==17
+replace reg_a = 7 if region==15
+replace reg_a = 8  if region==13
+replace reg_a = 9 if region==11
+replace reg_a = 10 if region==6
+replace reg_a = 11 if region==14
+replace reg_a = 12 if region==2
+replace reg_a = 13 if region==16
+replace reg_a = 14 if region==7
+replace reg_a = 15 if region==4
+replace reg_a = 16 if region==18
+replace reg_a = 17 if region==10
+replace reg_a = 18 if region==12
+replace reg_a = 19 if region==9
+replace reg_a = 20 if region==8
+
+* decolonising race and gender throught comparative, transitional arts based reserach
+* methods are 'feminists arts based approaches, including, cooking, photography and story mapping.' 
+
+label define reg_al 1"Rest of Scotland" 2"Rest of Yorks and Humberside" 3"Northern Ireland" 4"Tyne and Wear" 5"South Yorkshire" 6"Wales" 7"Merseyside"   ///
+			8"Rest of West Midlands" 9"South West" 10"East Midlands" 11"Greater Manchester" 12"Rest of Northern Region" 13"Rest of North West" 14"East Anglia" /// 
+			  15"West Yorkshire"   16"Strathclyde"  17"Rest of South East" 18"West Midlands" ///
+			19"Outer London" 20"Inner London" 
+		label values reg_a reg_al
+		label variable reg_a "Regions"
+
+
+tab reg_a
+
+reg mcamsis ib20.reg_a#i.grt_rec i.age i.HIQUAL5D if sex==1 & FTPT==1
+	margins ib20.reg_a#i.grt_rec, post
+	margins, coeflegend
+
+matrix list e(b)
+		
+ 		
+tab grt_rec		
+
+*** here I extract the marginal estimates and turn them into vraiables, so I can graph them for specific areas
+
+capture drop manchester_margin
+gen manchester_margin=_b[11.reg_a#1bn.grt_rec] if grt_rec==1
+replace manchester_margin=_b[11.reg_a#2.grt_rec] if grt_rec==2
+
+
+capture drop london_margin
+gen london_margin=_b[20.reg_a#1bn.grt_rec] if grt_rec==1
+replace london_margin=_b[20.reg_a#2.grt_rec] if grt_rec==2
+
+capture drop NI_margin
+gen NI_margin=_b[3.reg_a#1bn.grt_rec] if grt_rec==1
+replace NI_margin=_b[3.reg_a#2.grt_rec] if grt_rec==2
+
+/*
+
+matrix B = r(b)
+matrix list B // JUST SO YOU CAN SEE WHAT IT IS, NOT NECESSARY
+
+matrix V = r(V)
+matrix list V // AGAIN, JUST SO YOU CAN SEE IT
+
+gen dydx = .
+gen se_dydx = .
+forvalues g = 1/3 {
+    replace dydx = B[1, `g'] if group == `g'
+    replace se_dydx = sqrt(V[`g', `g']) if group == `g'
+}
+
+*/
+	
+	marginsplot, xlabel(, angle(55) labsize(vsmall)) ///
+			title("Occupational position [CAMSIS] of 18-24 year old men by region") ///
+				legend(position(5) ring(0) size(vsmall)) ///
+				xtitle("") ///
+				ytitle("") ///
+				xsize(6.5) ///
+				note("Model also controls for educational attainment and age" "Source, Labour Force Survey, 05-07 and 15-17") ///
+				scheme(s1mono)
+
+				/* reorganising region into CAMSIS score order for women
+				
+1	5    Rest of Yorks and Humberside#2005-2007  |   51.15067   1.016985    50.30   0.000      49.1571    53.14424
+2	2     Rest of Northern Region#2005-2007  |   52.25655   .9227994    56.63   0.000     50.44761     54.0655
+3	17                       Wales#2005-2007  |   52.43516    .769708    68.12   0.000     50.92632      53.944
+4	19  Rest of Scotland#2005-2007  |   52.98087   .8097482    65.43   0.000     51.39354    54.56821
+5	10            Northern Ireland#2005-2007  |   52.77412   .8463314    62.36   0.000     51.11507    54.43316
+6	3            South Yorkshire#2005-2007  |   52.90129    1.19641    44.22   0.000     50.55599    55.24658
+7	7                 East Anglia#2005-2007  |   53.02245   .8222677    64.48   0.000     51.41057    54.63432
+8	  18               Strathclyde#2005-2007  |   53.22886   .8565503    62.14   0.000     51.54978    54.90794
+9	6               East Midlands#2005-2007  |    53.2436   .5952561    89.45   0.000     52.07673    54.41047
+10	13       Rest of West Midlands#2005-2007  |   53.37349   .7847773    68.01   0.000     51.83511    54.91187
+11	11                  South West#2005-2007  |   53.48578   .5904881    90.58   0.000     52.32826     54.6433
+12	15                  Merseyside#2005-2007  |   53.62572   1.169308    45.86   0.000     51.33355    55.91789
+13	16          Rest of North West#2005-2007  |   53.97044   .7919083    68.15   0.000     52.41808     55.5228
+14	4              West Yorkshire#2005-2007  |   54.18138   .7410467    73.11   0.000     52.72872    55.63404
+15	14          Greater Manchester#2005-2007  |   54.28285   .7340512    73.95   0.000     52.84391     55.7218
+16	1               Tyne and Wear#2005-2007  |   54.48085   1.196796    45.52   0.000     52.13479     56.8269
+17	12               West Midlands#2005-2007  |   54.48848   .8917083    61.11   0.000     52.74048    56.23648
+18	9                Outer London#2005-2007  |   54.51027   .6685628    81.53   0.000      53.1997    55.82084
+19	10          Rest of South East#2005-2007  |   54.76702   .3624641   151.10   0.000     54.05649    55.47755
+20	8                Inner London#2005-2007  |   58.01348   .9196731    63.08   0.000     56.21066    59.81629
+				
+				
+				*/
+
+*** ordering the regions by lowest camsis to highest, for a nice graph, for women
+
+capture drop reg_b
+gen reg_b = . 
+replace reg_b = 1 if region==5
+replace reg_b = 2 if region==2
+replace reg_b = 3 if region==17
+replace reg_b = 4 if region==19
+replace reg_b = 5 if region==20
+replace reg_b = 6 if region==3
+replace reg_b = 7 if region==7
+replace reg_b = 8  if region==18
+replace reg_b = 9 if region==6
+replace reg_b = 10 if region==13
+replace reg_b = 11 if region==11
+replace reg_b = 12 if region==15
+replace reg_b = 13 if region==16
+replace reg_b = 14 if region==4
+replace reg_b = 15 if region==14
+replace reg_b = 16 if region==1
+replace reg_b = 17 if region==12
+replace reg_b = 18 if region==9
+replace reg_b = 19 if region==10
+replace reg_b = 20 if region==8
+
+
+label define reg_bl 1"Rest of Yorks and Humberside" 2"Rest of Northern Region" 3"Wales" 4"Rest of Scotland" 5"Northern Ireland" 6"South Yorkshire" 7"East Anglia" 8"Strathclyde" ///
+					9"East Midlands" 10"Rest of West Midlands" 11"South West" 12"Merseyside" 13"Rest of North West" 14"West Yorkshire" 15"Greater Manchester" 16"Tyne and Wear" ///
+					17"West Midlands" 18"Outer London" 19"Rest of South East" 20"Inner London" 
+		label values reg_b reg_bl
+		label variable reg_b "Regions"
+
+tab region reg_b
+
+reg fcamsis ib20.reg_b#i.grt_rec i.age i.HIQUAL5D if sex==2 & FTPT==1
+	margins ib20.reg_b#i.grt_rec, post
+	margins, coeflegend
+
+		marginsplot, xlabel(, angle(65) labsize(vsmall)) ///
+			title("Occupational position [CAMSIS] of 18-24 year old women by region") ///
+				legend(position(5) ring(0) size(vsmall)) ///
+				xtitle("") ///
+				ytitle("") ///
+				xsize(6.5) ///
+				note("Model also controls for educational attainment and age" "Source, Labour Force Survey, 05-07 and 15-17") ///
+				scheme(s1mono)
+
+*** extract the margins for graphing				
+				
+capture drop f_manchester_margin
+gen f_manchester_margin=_b[15.reg_b#1bn.grt_rec] if grt_rec==1
+replace f_manchester_margin=_b[15.reg_b#2.grt_rec] if grt_rec==2
+
+
+capture drop f_london_margin
+gen f_london_margin=_b[20.reg_b#1bn.grt_rec] if grt_rec==1
+replace f_london_margin=_b[20.reg_b#2.grt_rec] if grt_rec==2
+
+capture drop f_NI_margin
+gen f_NI_margin=_b[5.reg_b#1bn.grt_rec] if grt_rec==1
+replace f_NI_margin=_b[5.reg_b#2.grt_rec] if grt_rec==2
+				
+				
+*********************************************************************************
+
+*** I may really want to graph the marginal probabilities but I'll start with the mean
+
+egen man_cam = mean(mcamsis), by(region grt_rec) 
+
+*** MEN
+
+*** What is going on by region? how do the jobs change?
+
+*** MANCHESTER
+
+tab soc2000 if region==14 & sex==1 & grt_rec==1
+tab soc2000 if region==14 & sex==1 & grt_rec==2
+
+mean mcamsis if region==14 & sex==1 & grt_rec==1
+mean mcamsis if region==14 & sex==1 & grt_rec==2
+
+
+
+
+**** MANCHESTER MEN
+
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line manchester_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("Manchester 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(g1, replace)
+
+****		
+		
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ) || ///
+		(line manchester_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("Manchester 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(on pos(7) ring(0) col(1) label(1 ) label (2 "Predicted CAMSIS score") order(2)) ///
+		scheme(s1mono) ///
+		name(g2, replace)		
+
+graph combine g1 g2, scheme(s1mono) ///
+			title("CAMSIS score of young men [18-24]" "by SOC occupational group") ///
+			note("Models predicting CAMSIS controls age and educational attainment, source: Labour Force Survey")
+			
+	
+**** LONDON MEN			
+
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line london_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("London 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(g3, replace)
+
+****		
+		
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ) || ///
+		(line london_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("London 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(g4, replace)		
+
+graph combine g3 g4, scheme(s1mono) ///
+			title("Predicted CAMSIS score of young men [18-24]" "by SOC occupational group") ///
+			note("model of CAMSIS controls age and educational attainment, source: Labour Force Survey")
+
+
+**** Northern Ireland MEN			
+
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line NI_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("Northern Ireland 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(g5, replace)
+
+****		
+		
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ) || ///
+		(line NI_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("Northern Ireland 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(g6, replace)		
+
+graph combine g5 g6, scheme(s1mono) ///
+			title("Predicted CAMSIS score of young men [18-24]" "by SOC occupational group") ///
+			note("model of CAMSIS controls age and educational attainment, source: Labour Force Survey")
+			
+ 
+* GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN * GRAPHS WOMEN* GRAPHS WOMEN
+**************************************************************************************************************************************
+
+**** MANCHESTER WOMEN
+
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line f_manchester_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("Manchester 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w1, replace)
+
+****		
+		
+**** need to alter the y axis dimension
+		
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ylabel(20(20)100) ) || ///
+		(line f_manchester_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("Manchester 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w2, replace)		
+
+graph combine w1 w2, scheme(s1mono) ///
+			title("Predicted CAMSIS score of young women [18-24]" "by SOC occupational group") ///
+			note("model of CAMSIS controls age and educational attainment, source: Labour Force Survey")
+
+
+**** Northern Ireland WOMEN			
+
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line f_NI_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("Northern Ireland 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w3, replace)
+
+****	
+**** need to alter the  y axis dimension	
+		
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ylabel(20(20)100)) || ///
+		(line f_NI_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("Northern Ireland 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w4, replace)		
+
+graph combine w3 w4, scheme(s1mono) ///
+			title("Predicted CAMSIS score of young women [18-24]" "by SOC occupational group") ///
+			note("model of CAMSIS controls age and educational attainment, source: Labour Force Survey")
+			
+**** LONDON WOMEN			
+
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1,  msymbol(circle_hollow) ) || ///
+		(line f_london_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1, msymbol(circle_hollow) ), ///
+		title("London 2005-07") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w5, replace)
+
+****		
+		
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2,  msymbol(circle_hollow) ylabel(20(20)100) ) || ///
+		(line f_london_margin soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2, msymbol(circle_hollow) ), ///
+		title("London 2015-17") ///
+		xtitle("SOC Group") ///
+		legend(off) ///
+		scheme(s1mono) ///
+		name(w6, replace)		
+
+graph combine w5 w6, scheme(s1mono) ///
+			title("Predicted CAMSIS score of young women [18-24]" "by SOC occupational group") ///
+			note("model of CAMSIS controls age and educational attainment, source: Labour Force Survey")
+			
+			
+			* mean		
+		
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1, msymbol(circle_hollow) by(grt_rec)) ///
+		(line man_cam soc2000 [w=soc2000] if region==14 & sex==1, msymbol(circle_hollow) by(grt_rec) title("Manchester")) 
+		
+		
+		
+*** LONDON
+		
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==8 & sex==1, msymbol(circle_hollow) by(grt_rec)) ///
+		(lfit london_margin soc2000 [w=soc2000] if region==8 & sex==1, msymbol(circle_hollow) by(grt_rec) title("London")) 		
+
+		tab soc2000 if region==8 & sex==1 & grt_rec==1
+		tab soc2000 if region==8 & sex==1 & grt_rec==2
+		
+*** Northern Ireland		
+
+twoway (scatter mcamsis soc2000 [w=soc2000] if region==20 & sex==1, msymbol(circle_hollow) by(grt_rec)) ///
+		(lfit NI_margin soc2000 [w=soc2000] if region==20 & sex==1, msymbol(circle_hollow) by(grt_rec) title("Northern Ireland")) 		
+		
+* twoway scatter mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==1 || ///
+*				mcamsis soc2000 [w=soc2000] if region==14 & sex==1 & grt_rec==2
+*				, msymbol(circle_hollow) by(grt_rec)
+
+*********************************************************************************
+
+tab region
+
+*** WOMEN
+
+
+egen fem_cam = mean(fcamsis), by(region grt_rec) 
+
+*** London
+
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==8 & sex==2, msymbol(circle_hollow) by(grt_rec)) ///
+		(lfit f_london_margin soc2000 [w=soc2000] if region==8 & sex==2, msymbol(circle_hollow) by(grt_rec) title("London")) 		
+
+*** Northern Ireland 		
+		
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==20 & sex==2, msymbol(circle_hollow) by(grt_rec)) ///
+		(lfit f_NI_margin soc2000 [w=soc2000] if region==20 & sex==2, msymbol(circle_hollow) by(grt_rec) title("Northern Ireland")) 		
+
+		
+*** Manchester
+
+twoway (scatter fcamsis soc2000 [w=soc2000] if region==14 & sex==2, msymbol(circle_hollow) by(grt_rec)) ///
+		(lfit f_manchester_margin soc2000 [w=soc2000] if region==14 & sex==2, msymbol(circle_hollow) by(grt_rec) title("Manchester")) 		
+		
