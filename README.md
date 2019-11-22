@@ -18,5 +18,6 @@ In comparison to non-migrants
 	
 	
 Files:  Explore_20181212_KR_V1.do 	- this file does some organising and exploation of the LFS
-
+	 	paper1			- this file undertakes analysis of LFS 05-07 & 15-17, for a paper with Adam Fromby
+		
 
