@@ -18,7 +18,7 @@ In comparison to non-migrants
 	
 	
 Files:<br/> 
-Explore_20181212_KR_V1.do - this file does some organising and exploation of the LFS<br/>
-paper1	- this file undertakes analysis of LFS 05-07 & 15-17, for a paper with Adam Fromby<br/>
-youth_employment_rate - R code to graph the youth employment rate<br/>
-Youth_employment_rate_20190205 - data for the youth employment rate graph
+**Explore_20181212_KR_V1.do** - this file does some organising and exploation of the LFS<br/>
+**paper1**- this file undertakes analysis of LFS 05-07 & 15-17, for a paper with Adam Fromby<br/>
+**youth_employment_rate** - R code to graph the youth employment rate<br/>
+**Youth_employment_rate_20190205** - data for the youth employment rate graph
